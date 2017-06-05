@@ -1,0 +1,26 @@
+Phaser Questions 2:
+
+How do atlases work?
+
+Is "creature" something built in? One of the examples shows game.add.creature(....)
+
+Do animations get stored in json files? I thought they were used with atlases to select animation frames, but the dragon and phoenix examples seem to be calling for animations that aren't listed in the program. Also, the phoenix one doesn't even refer to a sprite, just an image, so what's the difference between a sprite, an image, and an atlas?
+
+The parts of the phaser world are still confusing me. I've now seen game.stage.backgroundColor along with the other background tags...Is there an overview of this somewhere? So far I think I've seen reference to world, stage, canvas, cache, layer, and frame...
+
+How does tweening work? Is it used for all transitions (scale, movement, etc.) that the physics engine doesn't handle?
+
+What does game.forceSingleUpdate = true; do? I've seen it in a few examples...I would guess that it either means that update must run once before something else happens, or that update runs only once, but neither makes a great deal of sense...
+
+What's the cache for, exactly? It seems to get used in the BitmapData examples, but I'm not clear on what it contains or is for. Also, what does it mean for a bitmapData object to be 'dirty'?
+
+OK, I guess 'How does bitmapData work?' needs to be added here too. It appears to be in pretty heavy use, and I don't know what to make of it.
+
+Several sprite/group questions here from the 'ballfield' example.
+	We have game.add.spriteBatch(); ... what's a sprite batch, and how is different from a sprite or sprite sheet?
+
+	sprites.addChild(star); I assume this is adding a new sprite to a group of them that was already made, but why is this necessary? So far the examples I've followed have made new objects within a group by using <group>.create();
+
+	stars.push(star); Particularly in light of the previous question, what does this line do?
+
+	This demo also refers to stars.perspective...what is this?

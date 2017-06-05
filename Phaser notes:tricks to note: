@@ -1,0 +1,62 @@
+Phaser notes/tricks to note:
+
+A sprite's image is referred to as a texture, and can be changed independently from the animation. So if two spritesheets have the same frames for animating them, the actual image can be switched out, as well as tested for. The example on phaser.io is "load-texture," and shows:
+
+if (sprite.key === 'monster')
+{
+	sprite.loadTexture('mummy', 0, false);
+}
+
+I don't know why there are three equals signs there, or what the 0 and false are for, but this is still useful to know.
+
+-`-`-`-`-`-`-`-`-`-`-
+
+
+Adding only a label/key for an animation will make it use all the available frames in the spritesheet.
+
+^---  The number of frames to use can also be specified by adding it to the end of the loading command. game.load.spritesheet('mummy', 'assets/sprites/mummy.png', 37, 45, 18); tells it to load the first 18 frames.
+
+-`-`-`-`-`-`-`-`-`-`-`-
+
+The rate of animation can be changed when calling 'play,' so the fast and slow animations don't really have to be separate things. For example: mummy.animations.play('walk', 30, true); tells it to run at 30 frames per second, and to loop.
+
+-`-`-`-`-`-`-`-`-`-`-`-`-
+
+Sprites can be created within Phaser. The dynamic-animation example loads an image called 'orb' (without assigning it to a variable), then creates a sprite with game.make.sprite(0,0,'orb');
+
+Next it makes "BitmapData" with var bmd = game.add.bitmapData(352, 22); telling the game how big the spritesheet will be, draws the image/sprite onto that bitmap data with bmd.draw(orb, x, y); and then adds it the cache...I'm losing track of things here, but it's worth looking at more.
+
+^--- Another example states that "A BitmapData is just a texture. You need to apply it to a sprite or image to actually display it."
+
+^--- the 'starfield' example also has game.add.renderTexture, so it gets more confusing again...
+
+^--- Also, 'springy' uses game.make.bitmapData(480, 480); what's the difference between make and add?
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
+
+Things can be made to move specific distances, over specific amounts of time (and presumably to specific locations as well, not just relative distances). The example move-over-distance uses: sprite.body.moveTo(2000, 300, Phaser.ANGLE_RIGHT); to move a sprite 300 pixels to the right over 2000 ms.
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-
+
+The mouse can be used with game.input.activePointer. It has, at least, isDown, postion.x, and position.y available.
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
+
+//  This returns an array of all the image keys in the cache
+    var images = game.cache.getKeys(Phaser.Cache.IMAGE);
+
+-`-`-`-`-`--`-`-`-`--`-``-`--`
+
+Apparently the Aracde physics engine works with either rectangles or circles. If we want to cut closer to the shapes for interaction, the P2 engine should be used.... It's going to take more investigation to to that though. See https://www.codeandweb.com/physicseditor/tutorials/phaser-p2-physics-example-tutorial
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
+
+|============From============ 
+|https://www.gaffga.de/presentations/phaser1/pres_phaser.html#/world
+|============================
+|
+| The "stage" is the larger container, inside of which is the "world,"
+| with objects existing inside that.
+**************** Debug Info ************
+game.debug.text(player.frame, 32, 32); // prints the frame of animation that player is on.
+
