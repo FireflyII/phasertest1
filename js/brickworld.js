@@ -39,6 +39,16 @@ function create() {
 	map.addTilesetImage('tree', 'treeset');
 
 	//create layers
+	/* The order matters here. The background comes first, with everything
+	* that's going to be behind everything else, with no interaction. The blocked
+	* layer comes next, sitting on top of (or in front of) the background layer,
+	* and consists of any walls/obstacles we'll be having the player be 'blocked' by.
+	* Next is the object layer, which is a little different (more later), where the player
+	* is, and finally an upper layer (placed later in the code so it will be after the object layer)
+	* that works just like the background layer (no interactions) but sits on top of everything else.
+	* All of these layers can be named anything, and how they are used (interaction or not)
+	* is determined here in Phaser, but they'll be drawn in the order they're listed in this code.
+	*/
 	backgroundLayer = map.createLayer('backgroundLayer'); //the 'backgroundLayer' is named in the tilemap
 	blockedLayer = map.createLayer('blockedLayer'); // ""
 	
