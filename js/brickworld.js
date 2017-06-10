@@ -12,7 +12,7 @@ function preload() {
 	//game.load.image('gameTiles', 'assets/images/tiles.png');
 	game.load.image('combined', 'assets/images/CombinedSheet.png');
 	game.load.image('floor', 'assets/images/FloorTiles.png');
-
+	game.load.image('treeset', 'assets/images/tree.png');
 	//load each of the individual object's images, despite the fact that they're in
 	//the tilemap/tile image... One upshot of this is that the same setup can be used
 	//with different sprites, I guess, but it still seems odd.
@@ -36,11 +36,12 @@ function create() {
 	//map.addTilesetImage('tiles', 'gameTiles');
 	map.addTilesetImage('CombinedSheet', 'combined');
 	map.addTilesetImage('FloorTiles', 'floor');
+	map.addTilesetImage('tree', 'treeset');
 
 	//create layers
 	backgroundLayer = map.createLayer('backgroundLayer'); //the 'backgroundLayer' is named in the tilemap
 	blockedLayer = map.createLayer('blockedLayer'); // ""
-
+	
 	//collision on blockedLayer
 	map.setCollisionBetween(1, 2000, true, 'blockedLayer'); // I don't know what these parameters are
 
@@ -69,6 +70,7 @@ function create() {
 	wasd = game.input.keyboard.addKeys({ 'up' : Phaser.KeyCode.W, 'down' : Phaser.KeyCode.S, 'left' : Phaser.KeyCode.A, 'right' : Phaser.KeyCode.D});
 	//add the "rolling" animation
 	player.animations.add('rolling');
+	upperLayer = map.createLayer('upperLayer');
 }
 
 function createItems(){
