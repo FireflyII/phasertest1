@@ -6,19 +6,17 @@ var game = new Phaser.Game(160, 160, Phaser.AUTO, '', { preload: preload, create
 
 function preload() {
 	//loading the tilemap...or at least the file that tells where tiles go?
-	game.load.tilemap('smallworld', 'assets/tilemaps/smallworld2.json', null, Phaser.Tilemap.TILED_JSON);
+	game.load.tilemap('combinedemo', 'assets/tilemaps/combinedemo.json', null, Phaser.Tilemap.TILED_JSON);
+	
 	//load the image of all the tiles separately from the tile map...
-	game.load.image('gameTiles', 'assets/images/tiles.png');
+	//game.load.image('gameTiles', 'assets/images/tiles.png');
+	game.load.image('combined', 'assets/images/CombinedSheet.png');
+	game.load.image('floor', 'assets/images/FloorTiles.png');
+
 	//load each of the individual object's images, despite the fact that they're in
 	//the tilemap/tile image... One upshot of this is that the same setup can be used
 	//with different sprites, I guess, but it still seems odd.
 
-	//I didn't realize the above when making the map, so used different objects and names.
-	//I'm guessing that I can substitue what I called them in the map, and just use the wrong images.
-	game.load.image('greencup', 'assets/images/greencup.png');
-	game.load.image('bluecup', 'assets/images/bluecup.png');
-	//game.load.image('player', 'assets/images/player.png');
-	game.load.image('browndoor', 'assets/images/browndoor.png');
 	
 	//I'm swapping out the tutorial's sprite for one of my own, with animations
 	game.load.spritesheet('player', 'assets/sprites/probe1.png', 32, 32);
@@ -32,10 +30,12 @@ function create() {
 	game.physics.startSystem(Phaser.Physics.ARCADE);
 
 	//add a map/tilemap object to the game?
-	map = game.add.tilemap('smallworld');
+	map = game.add.tilemap('combinedemo');
 
 	//provide the name of tileset from Tiled, and the 'key to the asset'
-	map.addTilesetImage('tiles', 'gameTiles');
+	//map.addTilesetImage('tiles', 'gameTiles');
+	map.addTilesetImage('CombinedSheet', 'combined');
+	map.addTilesetImage('FloorTiles', 'floor');
 
 	//create layers
 	backgroundLayer = map.createLayer('backgroundLayer'); //the 'backgroundLayer' is named in the tilemap
@@ -47,8 +47,8 @@ function create() {
 	//resize the game world to match the layer dimensions
 	backgroundLayer.resizeWorld();
 
-	createItems();
-	createDoors();
+	//createItems();
+	//createDoors();
 
 	//create the player
 	//Basically, search for the 'playerStart' object, of which there should
@@ -155,8 +155,8 @@ function update() {
 	// which layer an object is in rather than which group... or maybe which layer *and* which group?
 
 	game.physics.arcade.collide(player, blockedLayer); //collide with anything on the blocked layer, no matter what it is.
-	game.physics.arcade.overlap(player, items, collect, null); //overlap the player with things in the item group? I have to look at this again...
-	game.physics.arcade.overlap(player, doors, enterDoor, null); //overlap the player and doors (presumably this means an unlocked door, since we'd want collide for a locked one, right?)
+	//game.physics.arcade.overlap(player, items, collect, null); //overlap the player with things in the item group? I have to look at this again...
+	//game.physics.arcade.overlap(player, doors, enterDoor, null); //overlap the player and doors (presumably this means an unlocked door, since we'd want collide for a locked one, right?)
 
 
 }
