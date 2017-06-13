@@ -51,6 +51,39 @@ Apparently the Aracde physics engine works with either rectangles or circles. If
 
 -`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
 
+Modifier keys are apparently part of the attributes for normal keys... This means that instead of having to check, for example, if the space key and the up key are both being pressed, we check for the up key, and then for the 'shift' as part of it...
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
+
+Rather than setting collisions with everything on a specific layer, or in a group, we can specify collision functions based on tile location, or ID (which I think refers to the image being used...). Here are two examples:
+
+map.setTileIndexCallback(26, hitCoin, this);
+
+^--sets collisions with tiles with ID 26 and calls function hitCoin
+
+map.setTileLocationCallback(2, 0, 1, 1, hitCoin, this);
+
+^--sets a collision with map location 2, 0. I don't know what the other two numbers are for, how layers factor into these calls, or (once again) what 'this' is doing here, but it still seems worth knowing.
+
+https://phaser.io/examples/v2/tilemaps/features-test
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`
+
+game.world.setBounds(0,0,100,100)
+^---This sets the edges of the world...the camera won't move past this point, and presumably anything involving checking for/colliding with world edges will be constrained as well.
+
+The bounds of world do NOT equate to the size of the window on the page, or to the game's world (meaning there can still be things out of this area, you just aren't meant to go there...)
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
+
+While looking into camera controls, I came across a curious instance of movement. In this example: https://phaser.io/examples/v2/camera/camera-lerp
+the player's motion is stopped at each update by using the command player.body.setZeroVelocity(); instead of player.body.velocity.x =0 and player.body.velocity.y = 0; Even more interesting is that for three of the four directions, the command has been similarly abbreviated, with, for example, player.body.moveUp(300) instead of player.body.velocity.y = - 300. While it's certainly neater looking, I'm not sure what, if any, difference there is in how it behaves. I also don't know why the example stuck with adjusting the velocity for moving left instead of following this newer format.
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`
+
+
+
+
 |============From============ 
 |https://www.gaffga.de/presentations/phaser1/pres_phaser.html#/world
 |============================

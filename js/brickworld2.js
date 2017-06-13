@@ -1,4 +1,4 @@
-var game = new Phaser.Game(160, 160, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+var game = new Phaser.Game(180, 180, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 
 
 function preload() {
@@ -24,6 +24,8 @@ function preload() {
     // -- in regards to the object layer vs tile layer stuff...
     game.load.spritesheet('player', 'assets/sprites/probe1.png', 32, 32);
     game.load.spritesheet('openable', 'assets/images/wallOpening2.png', 32, 32);
+    game.load.spritesheet('blueButton', 'assets/images/BlueButton.png', 32, 32);
+    game.load.spritesheet('open2', 'assets/images/LowerWallOpener.png', 32, 32);
 }
 
 function create() {
@@ -70,6 +72,10 @@ function create() {
     //createItems();
     //createDoors();
 
+    //insert the button(s)
+    var r3 = findObjectsByType('button', map, 'objectLayer');
+    button = game.add.sprite(r3[0].x, r3[0].y, 'blueButton');
+    game.physics.arcade.enable(button);
     //create the player
     //Basically, search for the 'playerStart' object, of which there should
     //be only one, and use its position as the starting coordinates for the player
@@ -84,11 +90,20 @@ function create() {
     var r2 = findObjectsByType('secret', map, 'objectLayer');
     openwall = game.add.sprite(r2[0].x, r2[0].y, 'openable');
     game.physics.arcade.enable(openwall);
-    openwall.body.immovable =true;
+    openwall.body.immovable = true;
     openanimation = openwall.animations.add('opening');
+
+    var r4 = findObjectsByType('secret2', map, 'objectLayer');
+    openwall2 = game.add.sprite(r4[0].x, r4[0].y, 'open2');
+    game.physics.arcade.enable(openwall2);
+    openwall2.body.immovable = true;
+    openanimation2 = openwall2.animations.add('opening2');
+
 
     //follow the player with the camera
     game.camera.follow(player);
+    //the line after this one can be used as an alternative to the one above for smoother panning
+    //game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
 
     //enable cursor keys for player movement
     cursors = game.input.keyboard.createCursorKeys();
@@ -101,6 +116,22 @@ function create() {
 
     //add the upper layer (see above)
     upperLayer = map.createLayer('upperLayer');
+
+    //This isn't fully what I want to do, but it's a step in the right direction.
+    //This creates a limited window within the field of view, in which the player can
+    //move around. At the edge of that window, the camera will slide along, keeping
+    //the player in view. The point of this is to be able to use a portion of the screen
+    //for other things (like a progress bar, inventory, etc.) without getting in the
+    //way of the game. It's not ideal though, for a few reasons. 1.) It doesn't actually
+    //prevent the player from going further, just drags the camera with them. At the end of
+    //the actual game world, the player can move outside this window. 2.) Without this line
+    //the player is centered on screen at all times (except when near the edge of the world).
+    //With this line, they roam around the screen until hitting the virtual sides. It's not
+    //necessarily a bad thing, but it is a difference. Actually, scratch that, it is a bit of
+    //a problem, since the upper walls will always be just out of view now... that could be fixed
+    //by changing the rectangle, I guess, but still...not ideal.
+
+    //game.camera.deadzone = new Phaser.Rectangle(10, 10, 140, 110)
 }
 
 function createItems() {
@@ -174,60 +205,129 @@ function update() {
 
     //A simpler way to adjust animation speed later...
     var anispeed = 40;
-
+    var movespeed = 50;
     player.body.velocity.y = 0;
     player.body.velocity.x = 0;
     player.animations.stop();
-    if (cursors.up.isDown || wasd.up.isDown) {
-        player.body.velocity.y -= 50;
+
+    cursors.up.isDown||wasd.up.isDown?((cursors.up.shiftKey||wasd.up.shiftKey)&&(movespeed=100),player.body.velocity.y-=movespeed,player.angle=0,player.animations.play("rolling",anispeed,!0)):cursors.down.isDown||wasd.down.isDown?((cursors.down.shiftKey||wasd.down.shiftKey)&&(movespeed=100),player.body.velocity.y+=movespeed,player.angle=180,player.animations.play("rolling",anispeed,!0)):cursors.left.isDown||wasd.left.isDown?((cursors.left.shiftKey||wasd.left.shiftKey)&&(movespeed=100),player.body.velocity.x-=movespeed,player.angle=-90,player.animations.play("rolling",anispeed,!0)):(cursors.right.isDown||wasd.right.isDown)&&((cursors.right.shiftKey||wasd.right.shiftKey)&&(movespeed=100),player.body.velocity.x+=movespeed,player.angle=90,player.animations.play("rolling",anispeed,!0));
+    /*if (cursors.up.isDown || wasd.up.isDown) {
+        if (cursors.up.shiftKey || wasd.up.shiftKey) {
+            movespeed = 100;
+        }
+        player.body.velocity.y -= movespeed;
         player.angle = 0;
         player.animations.play('rolling', anispeed, true);
 
     } else if (cursors.down.isDown || wasd.down.isDown) {
-        player.body.velocity.y += 50;
+        if (cursors.down.shiftKey || wasd.down.shiftKey) {
+            movespeed = 100;
+        }
+        player.body.velocity.y += movespeed;
         player.angle = 180;
         player.animations.play('rolling', anispeed, true);
     } else if (cursors.left.isDown || wasd.left.isDown) {
-        player.body.velocity.x -= 50;
+        if (cursors.left.shiftKey || wasd.left.shiftKey) {
+            movespeed = 100;
+        }
+        player.body.velocity.x -= movespeed;
         player.angle = -90;
         player.animations.play('rolling', anispeed, true);
     } else if (cursors.right.isDown || wasd.right.isDown) {
-        player.body.velocity.x += 50;
+        if (cursors.right.shiftKey || wasd.right.shiftKey) {
+            movespeed = 100;
+        }
+        player.body.velocity.x += movespeed;
         player.angle = 90;
         player.animations.play('rolling', anispeed, true);
-    }
+    }*/
 
     // One of the two major reasons for this test is next: collision based on content
     // This should work almost, if not exactly, the same was a groups, but be based on
     // which layer an object is in rather than which group... or maybe which layer *and* which group?
 
     game.physics.arcade.collide(player, blockedLayer, hitwall, null); //collide with anything on the blocked layer, no matter what it is.
-    
+
     game.physics.arcade.collide(player, openwall, wallopen, null); // when hit, open the wall
 
+    game.physics.arcade.collide(player, openwall2, null, null);
     //game.physics.arcade.overlap(player, items, collect, null); //overlap the player with things in the item group? I have to look at this again...
     //game.physics.arcade.overlap(player, doors, enterDoor, null); //overlap the player and doors (presumably this means an unlocked door, since we'd want collide for a locked one, right?)
 
+    //There's almost certainly a better way to do this, but for now I'm just trying
+    //to see if I can do it at all. I want the button to be pressed down when the player
+    //is on top of it, and up otherwise.
+    if (button.overlap(player)) {
+        button.frame = 1;
+        wallopen2(player, openwall2);
+    } else {
+        button.frame = 0;
+    }
 
 }
 
-function wallopen(player, wall){
-	//stop the player's motion temporarily
-	player.body.velocity.x = 0;
-	player.body.velocity.y = 0;
-	//animate the wall opening up
-	openwall.animations.play('opening', 4, false, true); // play the animation at 4 fps, don't loop, and destroy the sprite at the end
-	console.log('opening the wall');
+function wallopen2(player, wall) {
+    //player.body.velocity.x = 0;
+    //player.body.velocity.y = 0;
+    openwall2.animations.play('opening2', 4, false, true);
+    console.log('opening other wall');
+    map.getTile(11, 13, 0).index = 6;
+    //var te = map.getTileBelow(wall.x, wall.y, 0);
+    //te.index = te.index-1;
+}
+
+function wallopen(player, wall) {
+    //stop the player's motion temporarily
+    player.body.velocity.x = 0;
+    player.body.velocity.y = 0;
+    //animate the wall opening up
+    openwall.animations.play('opening', 4, false, true); // play the animation at 4 fps, don't loop, and destroy the sprite at the end
+    console.log('opening the wall');
     //replace the floor tile so the shadow is gone.
     //for the moment, these are specific tile locations because there's only one
     //instance. I'll try to generalize it shortly.
-    map.putTile(map.getTile(13,8,0), 13, 7, 0); //take the tile at 13,8 on layer 0 (the background)
-                                                //and put a copy at 13,7 also layer 0.
+    map.putTile(map.getTile(13, 8, 0), 13, 7, 0); //take the tile at 13,8 on layer 0 (the background)
+    //and put a copy at 13,7 also layer 0.
 }
-function hitwall(player, wallpart){
-	//testing to see if we can identify parts of the wall when we run into them!
-	console.log('Ran into wall at X:'+wallpart.x+' Y:'+wallpart.y);
+/*
+ * In the above function I copied a floor tile up one space to get rid of the shadow.
+ * To be more extendible, though, I'd want to be able to check which tile image is being
+ * used in a spot, and change its image accordingly. This will require knowing more about
+ * the properties of a tile in order to identify the contents, and how to place a tile from
+ * the tileset, not just from a nearby tile! These aren't exactly high priorities right now,
+ * especially since what I've done so far does work, but it would be nice to get to at some point.
+ */
+
+/*
+ * Ok, I've got most of it, just haven't implemented it yet. Here's the idea:
+ * use map.getTileBelow (or left, right, etc.) to isolate the desired tile. Then,
+ * use <tile>.index = <tile>.index - 1 to shift its image to one lower on the sheet.
+ * This should work if the tilesheet is arranged properly (meaning in this case that
+ * every un-shaded version of a tile is placed right before the shaded one we're using).
+ * The main caveat here is that it apparrently doesn't take effect (i.e. doesn't redraw)
+ * until that tile has scrolled out of view and back. Still, it's actually a pretty simple
+ * way to be able to swap out adjacent tiles no matter where they're being placed in the map!
+ */
+function hitwall(player, wallpart) {
+    //testing to see if we can identify parts of the wall when we run into them!
+    console.log('Ran into wall at X:' + wallpart.x + ' Y:' + wallpart.y);
+    //for added fun, let's check if we hit a particular wall, and if so, jump the player somewhere else!
+    if (wallpart.x == 15 && wallpart.y == 16) {
+        game.camera.shake(0.1, 100);
+        player.x = 626.5;
+        player.y = 490.5;
+    }
+    if (wallpart.x == 10 && wallpart.y == 27) {
+        game.camera.shake(0.1, 100);
+        player.x = 150;
+    }
+    if (wallpart.x == 5 && wallpart.y == 27) {
+        game.camera.shake(0.1, 500);
+        player.x = 1032;
+        player.y = 914;
+    }
 }
+
 function collect(player, collectable) {
     console.log('yummy!');
     //remove sprite (different from killing it?)
