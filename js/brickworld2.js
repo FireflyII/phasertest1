@@ -322,6 +322,7 @@ function redWall(player, button) {
         if (map.getTile(button.opensX, button.opensY, 1).index == 24) {
             var wall = createWallTile(button.opensX, button.opensY);
             wallopen3(player, wall);
+            map.layers[0].dirty = true;
         }
     }
 
