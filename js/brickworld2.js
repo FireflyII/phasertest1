@@ -85,15 +85,6 @@ function create() {
     var r3 = findObjectsByType('button', map, 'objectLayer');
     button = game.add.sprite(r3[0].x, r3[0].y, 'blueButton');
     game.physics.arcade.enable(button);
-    //create the player
-    //Basically, search for the 'playerStart' object, of which there should
-    //be only one, and use its position as the starting coordinates for the player
-    //sprite. 
-    var result = findObjectsByType('playerStart', map, 'objectLayer');
-    player = game.add.sprite(result[0].x, result[0].y, 'player');
-    game.physics.arcade.enable(player);
-    player.anchor.setTo(0.5, 0.5);
-    player.scale.setTo(0.5, 0.5);
 
     //place the openable wall, which is also a sprite on the object layer*
     walls = game.add.group();
@@ -105,8 +96,8 @@ function create() {
     rBs.physicsBodyType = Phaser.Physics.ARCADE;
 
     var rBi = findObjectsByType('redButton', map, 'objectLayer');
-    rBi.forEach(function(bt){
-        var rB = rBs.create(bt.x, bt.y+bt.properties.height, 'redButton');
+    rBi.forEach(function(bt) {
+        var rB = rBs.create(bt.x, bt.y + bt.properties.height, 'redButton');
         rB.width = bt.properties.width;
         rB.height = bt.properties.height;
         rB.opensX = bt.properties.opensX;
@@ -118,7 +109,7 @@ function create() {
     // game.physics.arcade.enable(openwall);
     // openwall.body.immovable = true;
     // openanimation = openwall.animations.add('opening');
-    createWall(r2[0].x,r2[0].y);
+    createWall(r2[0].x, r2[0].y);
 
     var r4 = findObjectsByType('secret2', map, 'objectLayer');
     openwall2 = game.add.sprite(r4[0].x, r4[0].y, 'open2');
@@ -131,6 +122,16 @@ function create() {
     // game.physics.arcade.enable(trickwalls);
     // trickwalls.enableBody = true;
     // trickwalls.callAll('animations.add','animations','opening');
+    
+    //create the player
+    //Basically, search for the 'playerStart' object, of which there should
+    //be only one, and use its position as the starting coordinates for the player
+    //sprite. 
+    var result = findObjectsByType('playerStart', map, 'objectLayer');
+    player = game.add.sprite(result[0].x, result[0].y, 'player');
+    game.physics.arcade.enable(player);
+    player.anchor.setTo(0.5, 0.5);
+    player.scale.setTo(0.5, 0.5);
 
     //follow the player with the camera
     game.camera.follow(player);
@@ -166,19 +167,20 @@ function create() {
     //game.camera.deadzone = new Phaser.Rectangle(10, 10, 140, 110)
 }
 
-function createWall(bigX, bigY){
+function createWall(bigX, bigY) {
     var wall = walls.create(bigX, bigY, 'openable');
     wall.animations.add('opening');
     wall.body.immovable = true;
 }
 
-function createWallTile(littleX, littleY){
+function createWallTile(littleX, littleY) {
     map.removeTile(littleX, littleY, 1);
-    var wall = walls.create(littleX*32, littleY*32, 'openable');
+    var wall = walls.create(littleX * 32, littleY * 32, 'openable');
     wall.animations.add('opening');
     wall.body.immovable = true;
     return wall;
 }
+
 function createItems() {
     //create a group called 'items' and turn on physics for everything in it
     items = game.add.group();
@@ -296,8 +298,8 @@ function update() {
     //game.physics.arcade.collide(player, openwall, wallopen, null); // when hit, open the wall
     game.physics.arcade.collide(player, walls, wallopen3, null);
     game.physics.arcade.collide(player, openwall2, null, null);
-    
-    game.physics.arcade.collide(player, rBs, redWall, null);
+
+    game.physics.arcade.overlap(player, rBs, redWall, null);
     // game.physics.arcade.collide(player, trickwalls, wallopen3, null);
     // //game.physics.arcade.overlap(player, items, collect, null); //overlap the player with things in the item group? I have to look at this again...
     //game.physics.arcade.overlap(player, doors, enterDoor, null); //overlap the player and doors (presumably this means an unlocked door, since we'd want collide for a locked one, right?)
@@ -314,20 +316,26 @@ function update() {
 
 }
 
-function redWall(player, button){
-    var wall = createWallTile(button.opensX, button.opensY);
-    wallopen3(player, wall);
+function redWall(player, button) {
+    button.frame=1;
+    if (map.hasTile(button.opensX, button.opensY, 1)) {
+        if (map.getTile(button.opensX, button.opensY, 1).index == 24) {
+            var wall = createWallTile(button.opensX, button.opensY);
+            wallopen3(player, wall);
+        }
+    }
+
 }
 
 function wallopen3(player, wall) {
     //stop the player's motion temporarily
-    player.body.velocity.x = 0;
-    player.body.velocity.y = 0;
+    //player.body.velocity.x = 0;
+    //player.body.velocity.y = 0;
     //get the tile location of the wall (before we destroy it)
-    var temp = map.getTileWorldXY(wall.x, wall.y,32,32,0);
+    var temp = map.getTileWorldXY(wall.x, wall.y, 32, 32, 0);
     // more importantly, get the tile right below it (and on the background layer)
-    var temp2 = map.getTileBelow(0, temp.x,temp.y);
-    if (temp2.index==13) {
+    var temp2 = map.getTileBelow(0, temp.x, temp.y);
+    if (temp2.index == 13) {
         temp2.index = 10;
     } else if (temp2.index == 8) {
         temp2.index = 5;
@@ -336,7 +344,7 @@ function wallopen3(player, wall) {
     wall.animations.play('opening', 4, false, true); // play the animation at 4 fps, don't loop, and destroy the sprite at the end
     console.log('opening the wall');
     //replace the tile on the floor to get rid of the shadow...
-    
+
     //replace the floor tile so the shadow is gone.
     //for the moment, these are specific tile locations because there's only one
     //instance. I'll try to generalize it shortly.
@@ -404,14 +412,4 @@ function hitwall(player, wallpart) {
         player.x = 1032;
         player.y = 914;
     }
-}
-
-function collect(player, collectable) {
-    console.log('yummy!');
-    //remove sprite (different from killing it?)
-    collectable.destroy();
-}
-
-function enterDoor(player, door) {
-    console.log('entering door that will take you to' + door.targetTilemap + ' on x:' + door.targetX + ' and y:' + door.targetY);
 }
