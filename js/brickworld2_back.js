@@ -29,7 +29,6 @@ function preload() {
     game.load.spritesheet('openable', 'assets/images/wallOpening2.png', 32, 32);
     game.load.spritesheet('blueButton', 'assets/images/BlueButton.png', 32, 32);
     game.load.spritesheet('open2', 'assets/images/LowerWallOpener.png', 32, 32);
-    game.load.spritesheet('redButton', 'assets/images/RedButton.png', 32, 32);
 }
 
 function create() {
@@ -68,9 +67,7 @@ function create() {
      */
     backgroundLayer = map.createLayer('backgroundLayer'); //the 'backgroundLayer' is named in the tilemap
     blockedLayer = map.createLayer('blockedLayer'); // ""
-    // *** Why do we need to create the background and blocked layers, but not the object layer? ***
-    // *** It works without doing so, and doesn't if we try...
-    //objectLayer = map.createLayer('objectLayer');
+
     //collision on blockedLayer
     map.setCollisionBetween(1, 2000, true, 'blockedLayer'); // I don't know what these parameters are
 
@@ -96,29 +93,11 @@ function create() {
     player.scale.setTo(0.5, 0.5);
 
     //place the openable wall, which is also a sprite on the object layer*
-    walls = game.add.group();
-    walls.enableBody = true;
-    walls.physicsBodyType = Phaser.Physics.ARCADE;
-
-    rBs = game.add.group();
-    rBs.enableBody = true;
-    rBs.physicsBodyType = Phaser.Physics.ARCADE;
-
-    var rBi = findObjectsByType('redButton', map, 'objectLayer');
-    rBi.forEach(function(bt){
-        var rB = rBs.create(bt.x, bt.y+bt.properties.height, 'redButton');
-        rB.width = bt.properties.width;
-        rB.height = bt.properties.height;
-        rB.opensX = bt.properties.opensX;
-        rB.opensY = bt.properties.opensY;
-        rB.body.immovable = true;
-    });
     var r2 = findObjectsByType('secret', map, 'objectLayer');
-    // openwall = game.add.sprite(r2[0].x, r2[0].y, 'openable');
-    // game.physics.arcade.enable(openwall);
-    // openwall.body.immovable = true;
-    // openanimation = openwall.animations.add('opening');
-    createWall(r2[0].x,r2[0].y);
+    openwall = game.add.sprite(r2[0].x, r2[0].y, 'openable');
+    game.physics.arcade.enable(openwall);
+    openwall.body.immovable = true;
+    openanimation = openwall.animations.add('opening');
 
     var r4 = findObjectsByType('secret2', map, 'objectLayer');
     openwall2 = game.add.sprite(r4[0].x, r4[0].y, 'open2');
@@ -126,11 +105,11 @@ function create() {
     openwall2.body.immovable = true;
     openanimation2 = openwall2.animations.add('opening2');
 
-    // trickwalls = game.add.group();
-    // map.createFromTiles(24, null, 'openable', 1, trickwalls);
-    // game.physics.arcade.enable(trickwalls);
-    // trickwalls.enableBody = true;
-    // trickwalls.callAll('animations.add','animations','opening');
+    trickwalls = game.add.group();
+    map.createFromTiles(24, null, 'openable', 1, trickwalls);
+    game.physics.arcade.enable(trickwalls);
+    trickwalls.enableBody = true;
+    trickwalls.callAll('animations.add','animations','opening');
 
     //follow the player with the camera
     game.camera.follow(player);
@@ -166,19 +145,6 @@ function create() {
     //game.camera.deadzone = new Phaser.Rectangle(10, 10, 140, 110)
 }
 
-function createWall(bigX, bigY){
-    var wall = walls.create(bigX, bigY, 'openable');
-    wall.animations.add('opening');
-    wall.body.immovable = true;
-}
-
-function createWallTile(littleX, littleY){
-    map.removeTile(littleX, littleY, 1);
-    var wall = walls.create(littleX*32, littleY*32, 'openable');
-    wall.animations.add('opening');
-    wall.body.immovable = true;
-    return wall;
-}
 function createItems() {
     //create a group called 'items' and turn on physics for everything in it
     items = game.add.group();
@@ -293,13 +259,12 @@ function update() {
 
     game.physics.arcade.collide(player, blockedLayer, hitwall, null); //collide with anything on the blocked layer, no matter what it is.
 
-    //game.physics.arcade.collide(player, openwall, wallopen, null); // when hit, open the wall
-    game.physics.arcade.collide(player, walls, wallopen3, null);
+    game.physics.arcade.collide(player, openwall, wallopen, null); // when hit, open the wall
+
     game.physics.arcade.collide(player, openwall2, null, null);
     
-    game.physics.arcade.collide(player, rBs, redWall, null);
-    // game.physics.arcade.collide(player, trickwalls, wallopen3, null);
-    // //game.physics.arcade.overlap(player, items, collect, null); //overlap the player with things in the item group? I have to look at this again...
+    game.physics.arcade.collide(player, trickwalls, wallopen3, null);
+    //game.physics.arcade.overlap(player, items, collect, null); //overlap the player with things in the item group? I have to look at this again...
     //game.physics.arcade.overlap(player, doors, enterDoor, null); //overlap the player and doors (presumably this means an unlocked door, since we'd want collide for a locked one, right?)
 
     //There's almost certainly a better way to do this, but for now I'm just trying
@@ -314,29 +279,13 @@ function update() {
 
 }
 
-function redWall(player, button){
-    var wall = createWallTile(button.opensX, button.opensY);
-    wallopen3(player, wall);
-}
-
 function wallopen3(player, wall) {
     //stop the player's motion temporarily
     player.body.velocity.x = 0;
     player.body.velocity.y = 0;
-    //get the tile location of the wall (before we destroy it)
-    var temp = map.getTileWorldXY(wall.x, wall.y,32,32,0);
-    // more importantly, get the tile right below it (and on the background layer)
-    var temp2 = map.getTileBelow(0, temp.x,temp.y);
-    if (temp2.index==13) {
-        temp2.index = 10;
-    } else if (temp2.index == 8) {
-        temp2.index = 5;
-    }
     //animate the wall opening up
     wall.animations.play('opening', 4, false, true); // play the animation at 4 fps, don't loop, and destroy the sprite at the end
     console.log('opening the wall');
-    //replace the tile on the floor to get rid of the shadow...
-    
     //replace the floor tile so the shadow is gone.
     //for the moment, these are specific tile locations because there's only one
     //instance. I'll try to generalize it shortly.
