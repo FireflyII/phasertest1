@@ -1,0 +1,1 @@
+{"x":441.83333333333275,"y":340.8333333333321,"time":936047,"up":false,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}

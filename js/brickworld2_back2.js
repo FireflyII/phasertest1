@@ -14,7 +14,6 @@ function preload() {
     game.load.image('tunnel', 'assets/images/Tunnel clone.png');
     game.load.image('lava', 'assets/images/Pit3.png');
     game.load.image('bb', 'assets/images/BlueButton.png');
-    game.load.image('bridge', 'assets/images/BrickBridge.png');
 
     /* 
      * Images for any objects (things on the object layer to be interacted with)
@@ -55,7 +54,6 @@ function create() {
     map.addTilesetImage('Tunnel', 'tunnel');
     map.addTilesetImage('Pit3', 'lava');
     map.addTilesetImage('BlueButton', 'bb');
-    map.addTilesetImage('BrickBridge','bridge');
 
     //create layers
     /* The order matters here. The background comes first, with everything
@@ -80,6 +78,9 @@ function create() {
     // -- I *think* this makes it zoom in? I'm not sure...
     backgroundLayer.resizeWorld();
 
+    //createItems();
+    //createDoors();
+
     //insert the button(s)
     var r3 = findObjectsByType('button', map, 'objectLayer');
     button = game.add.sprite(r3[0].x, r3[0].y, 'blueButton');
@@ -90,12 +91,6 @@ function create() {
     walls.enableBody = true;
     walls.physicsBodyType = Phaser.Physics.ARCADE;
 
-    /* Create red buttons.
-     * This makes a group for the red buttons called rBs, and creates
-     * new sprites for each 'redButton' instance found on the object layer.
-     * It adjusts the size, sets the button so it won't move, and tacks
-     * on the extra parameters for the wall coordinates to open.
-     */
     rBs = game.add.group();
     rBs.enableBody = true;
     rBs.physicsBodyType = Phaser.Physics.ARCADE;
@@ -121,6 +116,12 @@ function create() {
     game.physics.arcade.enable(openwall2);
     openwall2.body.immovable = true;
     openanimation2 = openwall2.animations.add('opening2');
+
+    // trickwalls = game.add.group();
+    // map.createFromTiles(24, null, 'openable', 1, trickwalls);
+    // game.physics.arcade.enable(trickwalls);
+    // trickwalls.enableBody = true;
+    // trickwalls.callAll('animations.add','animations','opening');
     
     //create the player
     //Basically, search for the 'playerStart' object, of which there should
@@ -149,9 +150,6 @@ function create() {
     //add the upper layer (see above)
     upperLayer = map.createLayer('upperLayer');
 
-    //********* Create an array for data logging ********
-    hist = [];
-    
     //This isn't fully what I want to do, but it's a step in the right direction.
     //This creates a limited window within the field of view, in which the player can
     //move around. At the edge of that window, the camera will slide along, keeping
@@ -181,6 +179,19 @@ function createWallTile(littleX, littleY) {
     wall.animations.add('opening');
     wall.body.immovable = true;
     return wall;
+}
+
+function createItems() {
+    //create a group called 'items' and turn on physics for everything in it
+    items = game.add.group();
+    items.enableBody = true;
+    var item;
+    //create an array of objects found on the object layer with 'type' listed as 'item'
+    //(see comment for findObjectByType), then add each instance found to the items group.
+    result = findObjectsByType('item', map, 'objectLayer');
+    result.forEach(function(element) {
+        createFromTiledObject(element, items);
+    });
 }
 /*
  * This function comes from a tutorial, but the Phaser documentation hints at needing
@@ -215,42 +226,16 @@ function createFromTiledObject(element, group) {
     });
 }
 
-//Save to a file.
-function saveToFile(data){
-    jsonString = JSON.stringify(data);
-    $.ajax({
-        url: 'save.php',
-        data: {'jsonString':jsonString, 'fname':'logs/mortimer.txt'},
-        type: 'POST'
+function createDoors() {
+    doors = game.add.group();
+    doors.enableBody = true;
+    result = findObjectsByType('door', map, 'objectLayer');
+    result.forEach(function(element) {
+        createFromTiledObject(element, doors);
     });
 }
 
 function update() {
-    //********* Log the following on every update:
-    //      player's x coordinate
-    //      player's y coordinate
-    //      the game's timestamp
-    //      each of the input keys (wasd, shift, and arrow keys) statuses
-    //      ....
-
-    //hist.push(
-    saveToFile({
-        x: player.x,
-        y: player.y,
-        time: game.time.now,
-        up: cursors.up.isDown,
-        down: cursors.down.isDown,
-        left: cursors.left.isDown,
-        right: cursors.right.isDown,
-        w: wasd.up.isDown,
-        s: wasd.down.isDown,
-        a: wasd.left.isDown,
-        d: wasd.right.isDown
-        // shift key to be added later, since right now it looks like a pain to do...
-        // it's a modifier for every key rather than a separable thing. Basically you
-        // have up, up+shift, down, down+shift, etc....
-    });
-
     //player movement
     //My previous method set the velocity to specific number when
     //a key was pressed, and set it to zero otherwise. This version
@@ -265,14 +250,6 @@ function update() {
     //animations though... telling an animation to 'play' when it's already playing doesn't do anything?
     //it doesn't interrupt or start over? I'd need a longer (and more distinctive) animation to test this.
 
-    /*
-    *   Another 'glitch' I've come across:
-    *   If you hold down shift and a direction (with either the arrows or wasd) and let go
-    *   of the shift key, you'll keep moving at the faster pace until you let go of the direction.
-    *   If you then use the other set of keys for that direction (ie if you had held down up, and now use w),
-    *   you will continue to move at the faster pace in that direction, with no shift key required.
-    *   This remains in effect until you press the original direction again!
-    */
     //A simpler way to adjust animation speed later...
     var anispeed = 40;
     var movespeed = 50;
@@ -280,8 +257,6 @@ function update() {
     player.body.velocity.x = 0;
     player.animations.stop();
 
-    //The following line does everything contained in the commented out section right after it.
-    //I put it in to see if it would make a difference in how fast the game runs...
     cursors.up.isDown || wasd.up.isDown ? ((cursors.up.shiftKey || wasd.up.shiftKey) && (movespeed = 100), player.body.velocity.y -= movespeed, player.angle = 0, player.animations.play("rolling", anispeed, !0)) : cursors.down.isDown || wasd.down.isDown ? ((cursors.down.shiftKey || wasd.down.shiftKey) && (movespeed = 100), player.body.velocity.y += movespeed, player.angle = 180, player.animations.play("rolling", anispeed, !0)) : cursors.left.isDown || wasd.left.isDown ? ((cursors.left.shiftKey || wasd.left.shiftKey) && (movespeed = 100), player.body.velocity.x -= movespeed, player.angle = -90, player.animations.play("rolling", anispeed, !0)) : (cursors.right.isDown || wasd.right.isDown) && ((cursors.right.shiftKey || wasd.right.shiftKey) && (movespeed = 100), player.body.velocity.x += movespeed, player.angle = 90, player.animations.play("rolling", anispeed, !0));
     /*if (cursors.up.isDown || wasd.up.isDown) {
         if (cursors.up.shiftKey || wasd.up.shiftKey) {
@@ -341,10 +316,6 @@ function update() {
 
 }
 
-//when a player hits a red button, flip the button so it's pressed down,
-//check whether the coordinates associated with this button have the right
-//wall tile, and if so, make a new wall-opening sprite in its place, animate it,
-//and update the floor tile too.
 function redWall(player, button) {
     button.frame=1;
     if (map.hasTile(button.opensX, button.opensY, 1)) {
@@ -442,6 +413,4 @@ function hitwall(player, wallpart) {
         player.x = 1032;
         player.y = 914;
     }
-    //Another way to do the above might be to set collision/overlap calls to
-    //specific map tiles... just a thought.
 }
