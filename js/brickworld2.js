@@ -1,5 +1,6 @@
 var game = new Phaser.Game(180, 180, Phaser.AUTO, '', { preload: preload, create: create, update: update });
-
+//var fname = <?php echo htmlspecialchars($_POST[\"fname\"]); ?>;
+fname = 'logs/'+fname+'.txt';
 
 function preload() {
     //loading the tilemap
@@ -34,7 +35,7 @@ function preload() {
 }
 
 function create() {
-
+    game.time.events.loop(Phaser.Timer.SECOND * .2, logData, this);
     //Set up the game environment
     game.stage.backgroundColor = "#fff";
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -220,23 +221,16 @@ function saveToFile(data){
     jsonString = JSON.stringify(data);
     $.ajax({
         url: 'save.php',
-        data: {'jsonString':jsonString, 'fname':'logs/mortimer.txt'},
+        data: {'jsonString':jsonString, 'fname':fname},
         type: 'POST'
     });
 }
 
-function update() {
-    //********* Log the following on every update:
-    //      player's x coordinate
-    //      player's y coordinate
-    //      the game's timestamp
-    //      each of the input keys (wasd, shift, and arrow keys) statuses
-    //      ....
-
-    //hist.push(
+//Write the data recorded so far, and clear the way for more.
+function logData(){
     saveToFile({
-        x: player.x,
-        y: player.y,
+        x: Math.round(player.x),
+        y: Math.round(player.y),
         time: game.time.now,
         up: cursors.up.isDown,
         down: cursors.down.isDown,
@@ -250,6 +244,18 @@ function update() {
         // it's a modifier for every key rather than a separable thing. Basically you
         // have up, up+shift, down, down+shift, etc....
     });
+}
+
+function update() {
+    //********* Log the following on every update:
+    //      player's x coordinate
+    //      player's y coordinate
+    //      the game's timestamp
+    //      each of the input keys (wasd, shift, and arrow keys) statuses
+    //      ....
+
+    //hist.push({
+    
 
     //player movement
     //My previous method set the velocity to specific number when
