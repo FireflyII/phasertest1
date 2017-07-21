@@ -1,12 +1,6 @@
 var game = new Phaser.Game(160, 160, Phaser.AUTO, '', { preload: preload, create: create, update: update });
 //var fname = <?php echo htmlspecialchars($_POST[\"fname\"]); ?>;
-fname = 'logs/'+fname+'.txt';
-
-//These are the settings, but it's commented out because it's going into the php file for now.
-//var clearPossibilities = true;
-//var clearCourse = true;
-//var clearProgress = true;
-//var clearGoalreaching = true;
+//fname = 'logs/'+fname+'.txt';
 
 function preload() {
     //loading the tilemap
@@ -20,20 +14,14 @@ function preload() {
     game.load.image('treeset', 'assets/images/tree.png');
     game.load.image('tunnel', 'assets/images/Tunnel clone.png');
     game.load.image('lava', 'assets/images/Pit3.png');
-    game.load.image('bb', 'assets/sprites/BlueButton.png');
+    game.load.image('bb', 'assets/images/BlueButton.png');
     game.load.image('bridge', 'assets/images/BrickBridge.png');
     game.load.image('black','assets/images/Black.png');
     game.load.image('shade','assets/images/Shade.png');
     game.load.image('conveyor1', 'assets/sprites/conveyor1.png');
     game.load.image('pbar1', 'assets/images/pbar1.png');
     game.load.image('pbar2', 'assets/images/pbar2.png');
-    game.load.image('db', 'assets/images/Dialog Box.png');
-    game.load.image('InstBack', 'assets/images/InstBack.png');
-    game.load.image('InstFront', 'assets/images/InstFront.png');
-    game.load.image('over1','assets/images/over1.png');
-    game.load.image('over2', 'assets/images/over2.png');
-    game.load.image('pit','assets/images/pit.png');
-    game.load.image('RedLight','assets/images/RedLight.png');
+    game.load.image('db','assets/images/Dialog Box.png');
     /* 
      * Images for any objects (things on the object layer to be interacted with)
      * should also be loaded here. There aren't any at the moment, but this is where
@@ -45,19 +33,15 @@ function preload() {
     // -- If it were a static image, maybe it wouldn't need to be a sprite? This is still fuzzy
     // -- in regards to the object layer vs tile layer stuff...
     game.load.spritesheet('player', 'assets/sprites/probe1.png', 32, 32);
-    game.load.spritesheet('openable', 'assets/sprites/wallOpening2.png', 32, 32);
-    game.load.spritesheet('blueButton', 'assets/sprites/BlueButton.png', 32, 32);
-    game.load.spritesheet('open2', 'assets/sprites/LowerWallOpener.png', 32, 32);
-    game.load.spritesheet('redButton', 'assets/sprites/RedButton.png', 32, 32);
+    game.load.spritesheet('openable', 'assets/images/wallOpening2.png', 32, 32);
+    game.load.spritesheet('blueButton', 'assets/images/BlueButton.png', 32, 32);
+    game.load.spritesheet('open2', 'assets/images/LowerWallOpener.png', 32, 32);
+    game.load.spritesheet('redButton', 'assets/images/RedButton.png', 32, 32);
     game.load.spritesheet('conveyor1', 'assets/sprites/conveyor1.png',32,32);
-    game.load.spritesheet('scroll','assets/sprites/Scroll.png',32,32);
-    
-    // load the font to use so it's legible
-    game.load.bitmapFont('nokia16', 'assets/fonts/nokia16.png', 'assets/fonts/nokia16.xml');
 }
 
 function create() {
-    game.time.events.loop(Phaser.Timer.SECOND * 10, logData, this);
+    //game.time.events.loop(Phaser.Timer.SECOND * .2, logData, this);
     //Set up the game environment
     game.stage.backgroundColor = "#fff";
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -81,8 +65,6 @@ function create() {
     map.addTilesetImage('BrickBridge','bridge');
     map.addTilesetImage('Black','black');
     map.addTilesetImage('conveyor1','conveyor1');
-    map.addTilesetImage('pit','pit');
-    map.addTilesetImage('RedLight','RedLight');
 
     //create layers
     /* The order matters here. The background comes first, with everything
@@ -135,7 +117,6 @@ function create() {
         rB.height = bt.properties.height;
         rB.opensX = bt.properties.opensX;
         rB.opensY = bt.properties.opensY;
-        rB.LED = map.getTile(bt.properties.LEDX, bt.properties.LEDY, 1);
         rB.body.immovable = true;
     });
     var r2 = findObjectsByType('secret', map, 'objectLayer');
@@ -171,10 +152,6 @@ function create() {
 
     //also enable wasd for player movement
     wasd = game.input.keyboard.addKeys({ 'up': Phaser.KeyCode.W, 'down': Phaser.KeyCode.S, 'left': Phaser.KeyCode.A, 'right': Phaser.KeyCode.D });
-
-    //enable spacebar for use in closing the instruction window.
-    k=game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-    k.onDown.add(closeInst,this);
 
     //add the "rolling" animation 
     player.animations.add('rolling');
@@ -243,13 +220,6 @@ function create() {
     pinner.cameraOffset.setTo(0, -15);
     pperc = .1;
     pinner.scale.x = pperc;
-
-    mstate = 1; //movement state (dialog boxes versus game movement)
-    showInstructions();
-
-    //We'll need a simpler way to toggle the different game conditions, so consider this a placeholder
-    //for now. It will, however, influence which end text is shown.
-    condition = 4;
 }
 
 function createWall(bigX, bigY) {
@@ -310,7 +280,7 @@ function saveToFile(data){
 
 //Write the data recorded so far, and clear the way for more.
 function logData(){
-    saveToFile(/*{
+    saveToFile({
         x: Math.round(player.x),
         y: Math.round(player.y),
         time: game.time.now,
@@ -325,27 +295,10 @@ function logData(){
         // shift key to be added later, since right now it looks like a pain to do...
         // it's a modifier for every key rather than a separable thing. Basically you
         // have up, up+shift, down, down+shift, etc....
-    }*/
-    hist
-    );
-    hist=[];
+    });
 }
 
 function update() {
-    //This will probably move to the 'create' function once deployed, but is here for testing
-    //purposes so that we can toggle things while the game is running.
-    if (clearProgress){
-        pouter.visible=true;
-        pinner.visible=true;
-    }else {
-        pouter.visible=false;
-        pinner.visible=false;
-    }
-    if (clearCourse){
-        darkLayer.visible=false;
-    }else {
-        darkLayer.visible=true;
-    }
     //********* Log the following on every update:
     //      player's x coordinate
     //      player's y coordinate
@@ -353,19 +306,7 @@ function update() {
     //      each of the input keys (wasd, shift, and arrow keys) statuses
     //      ....
 
-    hist.push({
-        x: Math.round(player.x),
-        y: Math.round(player.y),
-        time: game.time.now,
-        up: cursors.up.isDown,
-        down: cursors.down.isDown,
-        left: cursors.left.isDown,
-        right: cursors.right.isDown,
-        w: wasd.up.isDown,
-        s: wasd.down.isDown,
-        a: wasd.left.isDown,
-        d: wasd.right.isDown
-    });
+    //hist.push({
     
 
     //player movement
@@ -399,34 +340,7 @@ function update() {
 
     //The following line does everything contained in the commented out section right after it.
     //I put it in to see if it would make a difference in how fast the game runs...
-    
-    if (mstate==1){
     cursors.up.isDown || wasd.up.isDown ? ((cursors.up.shiftKey || wasd.up.shiftKey) && (movespeed = 100), player.body.velocity.y -= movespeed, player.angle = 0, player.animations.play("rolling", anispeed, !0)) : cursors.down.isDown || wasd.down.isDown ? ((cursors.down.shiftKey || wasd.down.shiftKey) && (movespeed = 100), player.body.velocity.y += movespeed, player.angle = 180, player.animations.play("rolling", anispeed, !0)) : cursors.left.isDown || wasd.left.isDown ? ((cursors.left.shiftKey || wasd.left.shiftKey) && (movespeed = 100), player.body.velocity.x -= movespeed, player.angle = -90, player.animations.play("rolling", anispeed, !0)) : (cursors.right.isDown || wasd.right.isDown) && ((cursors.right.shiftKey || wasd.right.shiftKey) && (movespeed = 100), player.body.velocity.x += movespeed, player.angle = 90, player.animations.play("rolling", anispeed, !0));
-    } else if (mstate==2){
-        if (boxText.bottom>box.bottom){
-            scrollDown.visible=true;
-        }else {
-            scrollDown.visible=false;
-        }
-        if (boxText.top<box.top){
-            scrollUp.visible=true;
-        }else{
-            scrollUp.visible=false;
-        }
-        if (cursors.down.isDown || wasd.down.isDown){
-            if (boxText.bottom>box.bottom){
-                boxText.y-=1; //let it be jumpy for the moment, we'll smooth it out later
-            }
-        } else if (cursors.up.isDown || wasd.up.isDown){
-            if (boxText.top<box.top){
-                boxText.y+=1;
-            }
-        }
-    } else if (mstate==3){
-        if (game.input.activePointer.isDown){
-            console.log("Here's where we'll end it, somehow.");
-        }
-    }
     /*if (cursors.up.isDown || wasd.up.isDown) {
         if (cursors.up.shiftKey || wasd.up.shiftKey) {
             movespeed = 100;
@@ -483,9 +397,6 @@ function update() {
     if (button.overlap(player)) {
         button.frame = 1;
         wallopen2(player, openwall2);
-        player.x=111;
-        player.y=110;
-        gameOver();
     } else {
         button.frame = 0;
     }
@@ -504,12 +415,13 @@ function lightup(see, darktile){
 //and update the floor tile too.
 function redWall(player, button) {
     button.frame=1;
-    button.LED.index=118;
     if (map.hasTile(button.opensX, button.opensY, 1)) {
         if (map.getTile(button.opensX, button.opensY, 1).index == 24) {
             var wall = createWallTile(button.opensX, button.opensY);
             wallopen3(player, wall);
             map.layers[0].dirty = true;
+            pperc += .1;
+            pinner.scale.x = pperc;
         }
     }
 
@@ -539,11 +451,6 @@ function wallopen3(player, wall) {
     //instance. I'll try to generalize it shortly.
     //map.putTile(map.getTile(13, 8, 0), 13, 7, 0); //take the tile at 13,8 on layer 0 (the background)
     //and put a copy at 13,7 also layer 0.
-    
-    //give the player a boost to the progress bar
-    
-    pperc += .1;
-    pinner.scale.x = pperc;
 }
 
 function wallopen2(player, wall) {
@@ -622,77 +529,19 @@ function openDialog(x,y,text){
     db = game.add.image(x,y,'db');
     db.anchor.setTo(0.5,0.5);
     db.scale.setTo(0,0);
-    jv = game.add.tween(db.scale).to({x:1,y:1},500,"Linear",true,0,0,false);
-    //jva = game.add.tween(db.scale).to({x:0,y:0},500,"Linear",true,0,0,false);
+    jv = game.add.tween(db.scale).to({x:1,y:1},1000,"Linear",true,0,0,true);
+    jv.start();
     //this part creates a mask around the dialog box, with the expectation of
     //somehow adding scrolling text to it... I want to be able to add
     //text as an argument to the openDialog function, but there are apparently
     //a few hurdles to jump through first, namely dealing with sizing and placement
-    //mask = game.add.graphics(db.x-db.width/2,db.y-db.height/2);
-    //mask.beginFill(0xffffff);
-    //mask.drawRect(0,0,db.width,db.height);
-    //db.mask=mask;
-    //jv.onComplete.addOnce(function(){text = game.add.bitmapText(db.x-db.width/2+6,db.y-db.height/2+6,'nokia16',text,16);
-    jv.start();
-    //db.inputEnabled=true;
-    //db.events.onInputDown.add(function(){jva.start();db.destroy();});
-    //text.maxWidth=160;});
-}
+    mask = game.add.graphics(db.x-db.width/2,db.y-db.height/2);
+    mask.beginFill(0xffffff);
+    mask.drawRect(0,0,db.width,db.height);
+    db.mask=mask;
+    text = game.add.bitmapText(db.x-db.width/2,db.y-db.height/2,'nokia16',text,8);
+    text.maxWidth=160;
 
-function showInstructions(){
-    //335,224
-    box = game.add.image(415,272,'InstBack');
-    box.anchor.setTo(0.5,0.5);
-    box.scale.setTo(0,0);
-    bxup = game.add.tween(box.scale).to({x:1,y:1},500,"Linear",false,0,0,false);
-    bxup.onComplete.add(function(){
-    //The dialog box is open, now to make it into a mask
-    boxmask = game.add.graphics(335,224);
-    boxmask.beginFill(0xffffff);
-    boxmask.drawRect(0,0,160,96);
-    //load the text for the box
-    boxText = game.add.image(335,224,'InstFront');
-    boxText.mask=boxmask;
-    mstate=2; 
-    scrollDown = game.add.sprite(475,300,'scroll');
-    scrollDown.scale.setTo(0.5,0.5);
-    scrollDown.animations.add('scrl');
-    scrollDown.animations.play('scrl',2,true,false);   
-    scrollUp = game.add.sprite(490, 244,'scroll');
-    scrollUp.scale.setTo(0.5,0.5);
-    scrollUp.angle=180;
-    scrollUp.animations.add('scrl');
-    scrollUp.animations.play('scrl',2,true,false);
-    },this);
-    bxup.start();
-
-}
-
-function closeInst(){
-    boxText.destroy();
-    bxdown = game.add.tween(box.scale).to({x:0,y:0},500,"Linear",true,0,0,false);
-    //bxdown.onComplete.add(box.destroy);
-    boxmask.destroy();
-    scrollUp.destroy();
-    scrollDown.destroy();
-    mstate=1;
-}
-
-
-function gameOver(){
-    box = game.add.image(112,136,'InstBack');
-    box.anchor.setTo(0.5,0.5);
-    box.scale.setTo(0,0);
-    bxup = game.add.tween(box.scale).to({x:1,y:1},500,"Linear",false,0,0,false);
-    bxup.onComplete.add(function(){
-    if (clearGoalreaching){
-        boxText = game.add.image(box.left,box.top,'over2');
-    } else {
-        boxText = game.add.image(box.left,box.top,'over1');
-    }
-    mstate=3;    
-    },this);
-    bxup.start();
 }
 function render() {
 

@@ -16,9 +16,17 @@ body {
 <?php
 echo 'Name: ' . htmlspecialchars($_POST["name"]) . '!<br>';
 $fn = htmlspecialchars($_POST["fname"]);
+$possibilities = htmlspecialchars($_POST["possibilities"]);
+$course = htmlspecialchars($_POST["course"]);
+$goal = htmlspecialchars($_POST["goal"]);
+$progress = htmlspecialchars($_POST["progress"]);
 ?>
 <script type="text/javascript">
 var fname = "<?php echo $fn ?>";
+var clearPossibilities = "<?php echo $possibilities ?>"=="0";
+var clearCourse = "<?php echo $course ?>"=="0";
+var clearProgress = "<?php echo $progress ?>"=="0";
+var clearGoalreaching = "<?php echo $goal ?>"=="0";
 </script>
 <script src="js/brickworld2.js"></script>
 </body>

@@ -1,0 +1,100 @@
+{"frames": [
+
+{
+	"filename": "Black.png",
+	"frame": {"x":99,"y":195,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "BlueButton.png",
+	"frame": {"x":267,"y":163,"w":32,"h":61},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":3,"w":32,"h":61},
+	"sourceSize": {"w":32,"h":64}
+},
+{
+	"filename": "BrickBridge.png",
+	"frame": {"x":1,"y":195,"w":96,"h":33},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":96,"h":33},
+	"sourceSize": {"w":96,"h":96}
+},
+{
+	"filename": "brickset2 (1).png",
+	"frame": {"x":1,"y":1,"w":177,"h":192},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":0,"w":177,"h":192},
+	"sourceSize": {"w":192,"h":192}
+},
+{
+	"filename": "CombinedSheet.png",
+	"frame": {"x":310,"y":1,"w":128,"h":128},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":128},
+	"sourceSize": {"w":128,"h":128}
+},
+{
+	"filename": "FloorTiles.png",
+	"frame": {"x":180,"y":1,"w":128,"h":160},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":128,"h":160},
+	"sourceSize": {"w":128,"h":160}
+},
+{
+	"filename": "Pit3.png",
+	"frame": {"x":133,"y":195,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "RedButton.png",
+	"frame": {"x":301,"y":163,"w":32,"h":61},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":0,"y":3,"w":32,"h":61},
+	"sourceSize": {"w":32,"h":64}
+},
+{
+	"filename": "Shade.png",
+	"frame": {"x":167,"y":195,"w":32,"h":32},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":32,"h":32},
+	"sourceSize": {"w":32,"h":32}
+},
+{
+	"filename": "shadowmask1.png",
+	"frame": {"x":201,"y":163,"w":64,"h":64},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":64,"h":64},
+	"sourceSize": {"w":64,"h":64}
+},
+{
+	"filename": "tree.png",
+	"frame": {"x":335,"y":131,"w":77,"h":93},
+	"rotated": false,
+	"trimmed": true,
+	"spriteSourceSize": {"x":9,"y":3,"w":77,"h":93},
+	"sourceSize": {"w":96,"h":96}
+}],
+"meta": {
+	"app": "http://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "alltiles1.png",
+	"format": "RGBA8888",
+	"size": {"w":439,"h":229},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:452d50cd821e79cfef2322ddd30d30a9:4bca5a2730089f540bfec2aad8b797bd:8a28381092aba771d91280d2ab227343$"
+}
+}

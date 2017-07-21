@@ -81,6 +81,9 @@ the player's motion is stopped at each update by using the command player.body.s
 
 -`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`
 
+There's actually a fair amount of information stored regarding keyboard activity. For example, calling game.input.keyboard.lastKey returns a "Key" object which includes whether the key is presently up or down, whether alt, shift, or ctrl are down, how long the key has been up or down, the keyCode (for identifying it), the time at which is was last down and up and whether it was 'just' down.
+
+-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-`-
 
 
 

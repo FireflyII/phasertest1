@@ -1,0 +1,15 @@
+
+{"x":416,"y":288,"time":30635,"up":true,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":416,"y":288,"time":40650,"up":false,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":442,"y":282,"time":50647,"up":false,"down":false,"left":false,"right":true,"w":false,"s":false,"a":false,"d":false}
+{"x":39,"y":139,"time":60645,"up":false,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":1093,"y":914,"time":70642,"up":false,"down":false,"left":false,"right":true,"w":false,"s":false,"a":false,"d":false}
+{"x":879,"y":1212,"time":80640,"up":true,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":493,"y":969,"time":90654,"up":true,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":623,"y":622,"time":100651,"up":false,"down":true,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":1078,"y":644,"time":110649,"up":false,"down":true,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
+{"x":505,"y":807,"time":120646,"up":false,"down":false,"left":false,"right":true,"w":false,"s":false,"a":false,"d":false}
+{"x":696,"y":879,"time":130644,"up":false,"down":false,"left":false,"right":true,"w":false,"s":false,"a":false,"d":false}
+{"x":726,"y":1230,"time":140641,"up":false,"down":false,"left":false,"right":true,"w":false,"s":false,"a":false,"d":false}
+{"x":516,"y":622,"time":150656,"up":false,"down":false,"left":false,"right":true,"w":false,"s":false,"a":false,"d":false}
+{"x":104,"y":110,"time":160653,"up":false,"down":false,"left":false,"right":false,"w":false,"s":false,"a":false,"d":false}
