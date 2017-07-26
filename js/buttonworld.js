@@ -6,15 +6,17 @@ var game = new Phaser.Game(160, 160, Phaser.AUTO, '', { preload: preload, create
 // Set the name for the file to save the logs to
 // by taking a name from the php form and adding in
 // the directory and file extension 
-// ***and datestamp****
-//fname = 'logs/' + fname + '.txt';
+// Also add in a timestamp and a condition code (to know which conditions are set)
+cond="",clearCourse&&(cond+="C"),clearPossibilities&&(cond+="Po"),clearProgress&&(cond+="Pr"),clearGoalreaching&&(cond+="G");
+d = new Date();
+fname = 'logs/' +cond +'_'+ fname + d.getTime().toString() + '.txt';
 
 //These are the settings, but it's commented out because it's going into the php file for now.
-var clearPossibilities = true;
+/*var clearPossibilities = true;
 var clearCourse = true;
 var clearProgress = true;
 var clearGoalreaching = true;
-
+*/
 function preload() {
     // Import all of the resources for the game, namely the tilemap
     // and images
@@ -52,7 +54,7 @@ function create() {
     */
 
     // Start a timer to log data every X seconds
-    //game.time.events.loop(Phaser.Timer.SECOND * 10, logData, this);
+    game.time.events.loop(Phaser.Timer.SECOND * 10, logData, this);
 
     //Set up the game environment
     game.stage.backgroundColor = "#fff";
@@ -304,7 +306,7 @@ function update() {
 
     // button functionality
     game.physics.arcade.overlap(player, rBs, redWall, null);
-
+    game.physics.arcade.overlap(player, button, endButton, null);
 }
 
 // ******* Supporting Functions ********
@@ -379,7 +381,7 @@ function lightup(see, darktile) {
 //and update the floor tile too.
 function redWall(player, button) {
     button.frame = 1;
-    button.LED.index = 118;
+    button.LED.index = 85;
     if (map.hasTile(button.opensX, button.opensY, 1)) {
         if (map.getTile(button.opensX, button.opensY, 1).index == 32) {
             var wall = createWallTile(button.opensX, button.opensY);
@@ -387,6 +389,15 @@ function redWall(player, button) {
             map.layers[0].dirty = true;
         }
     }
+}
+
+//Use this button to end the game...we'll add an "are you sure" dialog
+//once dialog boxes are sorted out.
+function endButton(player, button){
+    button.frame=1;
+    game.camera.shake(0.1,500);
+    player.x=79;
+    player.y=83;
 }
 
 function wallopen(player, wall) {
@@ -397,8 +408,8 @@ function wallopen(player, wall) {
     var temp2 = map.getTileBelow(0, temp.x, temp.y);
     if (temp2.index == 77) {
         temp2.index = 74;
-    } else if (temp2.index == 8) {
-        temp2.index = 5;
+    } else if (temp2.index == 78) {
+        temp2.index = 76;
     }
     //animate the wall opening up
     wall.animations.play('opening', 4, false, true); // play the animation at 4 fps, don't loop, and destroy the sprite at the end
@@ -488,4 +499,10 @@ function gameOver() {
         mstate = 3;
     }, this);
     bxup.start();
+}
+
+function jumpUp(){
+	game.camera.shake(0.1, 100);
+    player.x = 625;
+    player.y = 19;
 }
