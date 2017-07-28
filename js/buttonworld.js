@@ -7,16 +7,17 @@ var game = new Phaser.Game(160, 160, Phaser.AUTO, '', { preload: preload, create
 // by taking a name from the php form and adding in
 // the directory and file extension 
 // Also add in a timestamp and a condition code (to know which conditions are set)
-cond="",clearCourse&&(cond+="C"),clearPossibilities&&(cond+="Po"),clearProgress&&(cond+="Pr"),clearGoalreaching&&(cond+="G");
+cond = "", clearCourse && (cond += "C"), clearPossibilities && (cond += "Po"), clearProgress && (cond += "Pr"), clearGoalreaching && (cond += "G");
 d = new Date();
-fname = 'logs/' +cond +'_'+ fname + d.getTime().toString() + '.txt';
+fname = 'logs/' + cond + '_' + fname + d.getTime().toString() + '.txt';
 
 //These are the settings, but it's commented out because it's going into the php file for now.
 /*var clearPossibilities = true;
 var clearCourse = true;
 var clearProgress = true;
 var clearGoalreaching = true;
-*/
+*/var endGame = false;
+
 function preload() {
     // Import all of the resources for the game, namely the tilemap
     // and images
@@ -45,6 +46,7 @@ function preload() {
     game.load.spritesheet('open2', 'assets/sprites/LowerWallOpener.png', 32, 32);
     game.load.spritesheet('redButton', 'assets/sprites/RedButton.png', 32, 32);
     game.load.spritesheet('scroll', 'assets/sprites/Scroll.png', 32, 32);
+    game.load.spritesheet('progbar', 'assets/sprites/progressbar.png',96,96);
 }
 
 function create() {
@@ -55,7 +57,11 @@ function create() {
 
     // Start a timer to log data every X seconds
     game.time.events.loop(Phaser.Timer.SECOND * 10, logData, this);
+    logging = true;
 
+    // Start a timer for inactiivty that will end the game if nothing happens for a while
+    game.time.events.loop(Phaser.Timer.SECOND * 30, checkActive, this);
+    active = true;
     //Set up the game environment
     game.stage.backgroundColor = "#fff";
     game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -127,7 +133,7 @@ function create() {
     game.physics.arcade.enable(player);
     player.anchor.setTo(0.5, 0.5);
     player.scale.setTo(0.5, 0.5);
-    player.body.collideWorldBounds=true; // stay in the game!
+    player.body.collideWorldBounds = true; // stay in the game!
 
     //follow the player with the camera
     game.camera.follow(player);
@@ -176,19 +182,11 @@ function create() {
     //but with their visibility toggled for each condition. That way, there shouldn't
     //be any performance differences, because the same code will be running.
 
-    //pouter = progress bar, outer part (the outline)
-    //pinner = progress bar, inner part (the shading)
-    //pperc = the percentage of the bar to fill...
-    pouter = game.add.sprite(0, 0, 'pbar1');
-    pinner = game.add.sprite(0, 0, 'pbar2');
-    pouter.scale.setTo(1, .5);
-    pinner.scale.setTo(1, .5);
-    pouter.fixedToCamera = true;
-    pinner.fixedToCamera = true;
-    pouter.cameraOffset.setTo(0, -15);
-    pinner.cameraOffset.setTo(0, -15);
-    pperc = .1;
-    pinner.scale.x = pperc;
+    pbar = game.add.sprite(230,192,'progbar');
+    pbar.scale.setTo(0.5,0.5);
+    pbar.fixedToCamera = true;
+    pbar.cameraOffset.x = 0;
+    pbar.cameraOffset.y = 0;
 
     // set the 'movement state' so we can use arrow keys for different purposes at different times
     mstate = 1;
@@ -201,11 +199,9 @@ function update() {
     //This will probably move to the 'create' function once deployed, but is here for testing
     //purposes so that we can toggle things while the game is running.
     if (clearProgress) {
-        pouter.visible = true;
-        pinner.visible = true;
+        pbar.visible=true;
     } else {
-        pouter.visible = false;
-        pinner.visible = false;
+        pbar.visible=false;
     }
     if (clearCourse) {
         darkLayer.visible = false;
@@ -219,18 +215,24 @@ function update() {
     //      each of the input keys (wasd, shift, and arrow keys) statuses
     //      ....
 
+    // To aid readibility and shorten the file, the keys pressed will be
+    // truncated to a string of characters representing them. UDLR refer to
+    // up, down, left, and right on the arrow keys, while udlr are the equivalent
+    // with the wsad set.
+    keysdown="",cursors.up.isDown&&(keysdown+="U"),cursors.down.isDown&&(keysdown+="D"),cursors.left.isDown&&(keysdown+="L"),cursors.right.isDown&&(keysdown+="R"),wasd.up.isDown&&(keysdown+="u"),wasd.down.isDown&&(keysdown+="d"),wasd.left.isDown&&(keysdown+="l"),wasd.right.isDown&&(keysdown+="r");
     hist.push({
         x: Math.round(player.x),
         y: Math.round(player.y),
         time: game.time.now,
-        up: cursors.up.isDown,
+        keys: keysdown
+        /*up: cursors.up.isDown,
         down: cursors.down.isDown,
         left: cursors.left.isDown,
         right: cursors.right.isDown,
         w: wasd.up.isDown,
         s: wasd.down.isDown,
         a: wasd.left.isDown,
-        d: wasd.right.isDown
+        d: wasd.right.isDown*/
     });
 
     //player movement
@@ -248,7 +250,7 @@ function update() {
             player.body.velocity.y -= movespeed;
             player.angle = 0;
             player.animations.play('rolling', anispeed, true);
-
+            active=true;
         } else if (cursors.down.isDown || wasd.down.isDown) {
             if (cursors.down.shiftKey || wasd.down.shiftKey) {
                 movespeed = 100;
@@ -256,6 +258,7 @@ function update() {
             player.body.velocity.y += movespeed;
             player.angle = 180;
             player.animations.play('rolling', anispeed, true);
+            active=true;
         } else if (cursors.left.isDown || wasd.left.isDown) {
             if (cursors.left.shiftKey || wasd.left.shiftKey) {
                 movespeed = 100;
@@ -263,6 +266,7 @@ function update() {
             player.body.velocity.x -= movespeed;
             player.angle = -90;
             player.animations.play('rolling', anispeed, true);
+            active=true;
         } else if (cursors.right.isDown || wasd.right.isDown) {
             if (cursors.right.shiftKey || wasd.right.shiftKey) {
                 movespeed = 100;
@@ -270,6 +274,7 @@ function update() {
             player.body.velocity.x += movespeed;
             player.angle = 90;
             player.animations.play('rolling', anispeed, true);
+            active=true;
         }
     } else if (mstate == 2) {
         if (boxText.bottom > box.bottom) {
@@ -285,10 +290,12 @@ function update() {
         if (cursors.down.isDown || wasd.down.isDown) {
             if (boxText.bottom > box.bottom) {
                 boxText.y -= 1; //let it be jumpy for the moment, we'll smooth it out later
+                active=true;
             }
         } else if (cursors.up.isDown || wasd.up.isDown) {
             if (boxText.top < box.top) {
                 boxText.y += 1;
+                active=true;
             }
         }
     } else if (mstate == 3) {
@@ -355,8 +362,20 @@ function createWallTile(littleX, littleY) {
 
 // Send stored data to the output file and clear the array for more
 function logData() {
-    saveToFile(hist);
-    hist = [];
+    if (logging) {
+        saveToFile(hist);
+        hist = [];
+    }
+}
+
+// Check whether the player has been inactive
+function checkActive(){
+    if (!active){
+        logging=false;
+        window.location.assign("inactive.html")
+    } else {
+        active=false;
+    }
 }
 
 //Save to a file.
@@ -382,6 +401,7 @@ function lightup(see, darktile) {
 function redWall(player, button) {
     button.frame = 1;
     button.LED.index = 85;
+    button.alpha=0.2;
     if (map.hasTile(button.opensX, button.opensY, 1)) {
         if (map.getTile(button.opensX, button.opensY, 1).index == 32) {
             var wall = createWallTile(button.opensX, button.opensY);
@@ -393,11 +413,12 @@ function redWall(player, button) {
 
 //Use this button to end the game...we'll add an "are you sure" dialog
 //once dialog boxes are sorted out.
-function endButton(player, button){
-    button.frame=1;
-    game.camera.shake(0.1,500);
-    player.x=79;
-    player.y=83;
+function endButton(player, button) {
+    button.frame = 1;
+    game.camera.shake(0.1, 500);
+    player.x = 79;
+    player.y = 83;
+    gameOver();
 }
 
 function wallopen(player, wall) {
@@ -416,8 +437,7 @@ function wallopen(player, wall) {
     console.log('opening the wall');
 
     //boost the progress bar
-    pperc += .1;
-    pinner.scale.x = pperc;
+    pbar.frame+=1;
 }
 
 //report when the player runs into a wall (for debugging purposes)
@@ -428,6 +448,11 @@ function hitwall(player, wallpart) {
         game.camera.shake(0.1, 100);
         player.x = 626.5;
         player.y = 490.5;
+    }
+    if (wallpart.x == 15 && wallpart.y == 19){
+        game.camera.shake(0.1, 100);
+        player.x = 622.5;
+        player.y = 40;
     }
 }
 
@@ -464,11 +489,24 @@ function showInstructions() {
         scrollDown.scale.setTo(0.5, 0.5);
         scrollDown.animations.add('scrl');
         scrollDown.animations.play('scrl', 2, true, false);
+        scrollDown.inputEnabled=true;
+        scrollDown.events.onInputDown.add(
+            function() {
+            if (boxText.bottom > box.bottom) {
+                boxText.y -= 1; //let it be jumpy for the moment, we'll smooth it out later
+            }},this)
+
         scrollUp = game.add.sprite(385, 258, 'scroll');
         scrollUp.scale.setTo(0.5, 0.5);
         scrollUp.angle = 180;
         scrollUp.animations.add('scrl');
         scrollUp.animations.play('scrl', 2, true, false);
+        scrollUp.inputEnabled=true;
+        scrollUp.events.onInputDown.add(function() {
+            if (boxText.top < box.top) {
+                boxText.y += 1; //let it be jumpy for the moment, we'll smooth it out later
+            }},this)
+
     }, this);
     bxup.start();
 }
@@ -481,12 +519,15 @@ function closeInst() {
     scrollUp.destroy();
     scrollDown.destroy();
     mstate = 1;
+    if (endGame){
+        window.location.assign("after.html")
+    }
 }
 
 function gameOver() {
     // Using the same box from the intstructions, but with
     // different text depending on the game condition.
-    box = game.add.image(112, 136, 'InstBack');
+    box = game.add.image(80, 111, 'InstBack');
     box.anchor.setTo(0.5, 0.5);
     box.scale.setTo(0, 0);
     bxup = game.add.tween(box.scale).to({ x: 1, y: 1 }, 500, "Linear", false, 0, 0, false);
@@ -499,10 +540,12 @@ function gameOver() {
         mstate = 3;
     }, this);
     bxup.start();
+    //stop logging
+    endGame = true;
 }
 
-function jumpUp(){
-	game.camera.shake(0.1, 100);
+function jumpUp() {
+    game.camera.shake(0.1, 100);
     player.x = 625;
     player.y = 19;
 }
