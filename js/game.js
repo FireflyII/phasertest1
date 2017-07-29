@@ -2,7 +2,7 @@
 // and y values. We are setting it to 640 pixels across, and 480 pixels
 // down. Note also that the 'gameDiv' parameter matches the div element
 // defined in our index.html file 
-var game = new Phaser.Game(640, 480, Phaser.AUTO, 'gameDiv');
+var game = new Phaser.Game(160, 160, Phaser.AUTO, 'gameDiv');
 
 //These are the settings, but it's commented out because it's going into the php file for now.
 var clearPossibilities = true;

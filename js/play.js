@@ -30,7 +30,7 @@ preload: function() {
     game.load.image('pbar1', 'assets/images/pbar1.png');
     game.load.image('pbar2', 'assets/images/pbar2.png');
     game.load.image('db', 'assets/images/Dialog Box.png');
-
+    game.load.image('close','assets/images/close.png');
     // Load sprites (anything that will be animated)
     game.load.spritesheet('player', 'assets/sprites/probe1.png', 32, 32);
     game.load.spritesheet('openable', 'assets/sprites/wallopening2.png', 32, 32);
@@ -487,7 +487,6 @@ showInstructions: function() {
             if (boxText.bottom > box.bottom) {
                 boxText.y -= 1; //let it be jumpy for the moment, we'll smooth it out later
             }},this)
-
         scrollUp = game.add.sprite(385, 258, 'scroll');
         scrollUp.scale.setTo(0.5, 0.5);
         scrollUp.angle = 180;
@@ -498,7 +497,11 @@ showInstructions: function() {
             if (boxText.top < box.top) {
                 boxText.y += 1; //let it be jumpy for the moment, we'll smooth it out later
             }},this)
-
+        closeButton = game.add.image(381,240,'close');
+        closeButton.scale.setTo(0.5,0.5);
+        closeButton.inputEnabled=true;
+        closeButton.events.onInputDown.add(
+        	playState.closeInst);
     }, this);
     bxup.start();
 },
@@ -510,6 +513,7 @@ closeInst: function() {
     boxmask.destroy();
     scrollUp.destroy();
     scrollDown.destroy();
+    closeButton.destroy();
     mstate = 1;
     if (endGame){
         window.location.assign("after.html")
