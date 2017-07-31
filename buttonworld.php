@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta charset = "utf-8" />
-<title>Brickworld</title>
+<title>Buttonworld</title>
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="js/phaser.js"></script>
 <style>
@@ -28,6 +28,11 @@ var clearCourse = "<?php echo $course ?>"=="0";
 var clearProgress = "<?php echo $progress ?>"=="0";
 var clearGoalreaching = "<?php echo $goal ?>"=="0";
 </script>
-<script src="js/buttonworld.js"></script>
-</body>
+<div id="gameDiv"> </div>
+<script src="js/play.js"></script>
+<script src="js/boot.js"></script>
+<script src="js/gameover.js"></script>
+<script src="js/game.js"></script>
+<!-- <script src="js/buttonworld.js"></script>
+ --></body>
 </html>
