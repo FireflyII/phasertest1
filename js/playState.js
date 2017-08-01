@@ -1,7 +1,7 @@
 //play
-cond = "", clearCourse && (cond += "C"), clearPossibilities && (cond += "Po"), clearProgress && (cond += "Pr"), clearGoalreaching && (cond += "G");
-d = new Date();
-fname = 'logs/' + cond + '_' + fname + d.getTime().toString() + '.txt';
+//cond = "", clearCourse && (cond += "C"), clearPossibilities && (cond += "Po"), clearProgress && (cond += "Pr"), clearGoalreaching && (cond += "G");
+//d = new Date();
+//fname = 'logs/' + cond + '_' + fname + d.getTime().toString() + '.txt';
 
 var playState = {
     // Set the name for the file to save the logs to
@@ -53,7 +53,7 @@ var playState = {
         game.scale.setGameSize(200, 200);
         game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
         // Start a timer to log data every X seconds
-        game.time.events.loop(Phaser.Timer.SECOND * 10, this.logData, this);
+        //game.time.events.loop(Phaser.Timer.SECOND * 10, this.logData, this);
         logging = true;
 
         // Start a timer for inactiivty that will end the game if nothing happens for a while

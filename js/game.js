@@ -5,10 +5,10 @@
 var game = new Phaser.Game("100", "100", Phaser.AUTO, 'gameDiv');
 
 //These are the settings, but it's commented out because it's going into the php file for now.
-// var clearPossibilities = true;
-// var clearCourse = false;
-// var clearProgress = true;
-// var clearGoalreaching = true;
+var clearPossibilities = true;
+var clearCourse = false;
+var clearProgress = true;
+var clearGoalreaching = true;
  var endGame = false;
  var pressedSum = 0;
 
