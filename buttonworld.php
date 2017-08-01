@@ -29,9 +29,9 @@ var clearProgress = "<?php echo $progress ?>"=="0";
 var clearGoalreaching = "<?php echo $goal ?>"=="0";
 </script>
 <div id="gameDiv"> </div>
-<script src="js/play.js"></script>
-<script src="js/boot.js"></script>
-<script src="js/gameover.js"></script>
+<script src="js/playState.js"></script>
+<script src="js/introState.js"></script>
+<script src="js/gameoverState.js"></script>
 <script src="js/game.js"></script>
 <!-- <script src="js/buttonworld.js"></script>
  --></body>
