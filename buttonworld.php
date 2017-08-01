@@ -15,7 +15,7 @@ body {
 <body>
 <?php
 echo 'Name: ' . htmlspecialchars($_POST["name"]) . '!<br>';
-$fn = htmlspecialchars($_POST["fname"]);
+$fn = htmlspecialchars($_POST["name"]);
 $possibilities = htmlspecialchars($_POST["possibilities"]);
 $course = htmlspecialchars($_POST["course"]);
 $goal = htmlspecialchars($_POST["goal"]);

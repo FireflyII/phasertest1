@@ -26,7 +26,7 @@ var bootState = {
         // first two parameters are x and y positional values, then the
         // actual text, and then the 'font' defines the font (of course)
         // and 'fill' refers to the font color.
-        nameLabel = game.add.text(80, 80, InText, { font: '20px Arial', fill: '#ffffff' });
+        nameLabel = game.add.text(80, 80, inText, { font: '20px Arial', fill: '#ffffff' });
         nameLabel.wordWrap = true;
         nameLabel.wordWrapWidth = game.width - 100;
 

@@ -9,8 +9,8 @@ var game = new Phaser.Game("100", "100", Phaser.AUTO, 'gameDiv');
 // var clearCourse = false;
 // var clearProgress = true;
 // var clearGoalreaching = true;
-// var endGame = false;
-// var pressedSum = 0;
+ var endGame = false;
+ var pressedSum = 0;
 
 // Here we add each state. We give it a casual name that we use when
 // calling it (i.e. 'boot'), and an official name that we use when 
